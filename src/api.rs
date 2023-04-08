@@ -7,7 +7,7 @@ use serde_derive::{Deserialize, Serialize};
 use reqwest::{Method, multipart::Part};
 use tracing::*;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ErrorInfo {
     pub message: String,
     #[serde(rename = "type")]
@@ -16,12 +16,12 @@ pub struct ErrorInfo {
     pub code: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ReturnErrorType {
     pub error: ErrorInfo,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct OpenAIApiError {
     pub code: i32,
     pub error: ErrorInfo,
@@ -47,7 +47,7 @@ impl OpenAIApiError {
 pub type Error = reqwest::Error;
 
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Permission {
     pub id: String,
     pub object: String,
@@ -63,7 +63,7 @@ pub struct Permission {
     pub is_blocking: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ModelInfo {
     pub id: String,
     pub object: String,
@@ -73,7 +73,7 @@ pub struct ModelInfo {
     pub parent: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ListModelsResponse {
     pub data: Vec<ModelInfo>,
     pub object: String,
@@ -81,9 +81,9 @@ pub struct ListModelsResponse {
 
 pub type RetrieveModelResponse = ModelInfo;
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateCompletionRequest {
-    /// ID of the model to use. 
+    /// ID of the model to use.
     /// You can use the List models API to see all of your available models, or see our Model overview for descriptions of them.
     pub model: String,
     /// The prompt(s) to generate completions for, encoded as a string, array of strings, array of tokens, or array of token arrays.
@@ -94,7 +94,7 @@ pub struct CreateCompletionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub suffix: Option<String>,
     /// The maximum number of tokens to generate in the completion.
-    /// The token count of your prompt plus max_tokens cannot exceed the model's context length. 
+    /// The token count of your prompt plus max_tokens cannot exceed the model's context length.
     /// Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<u64>,
@@ -102,20 +102,20 @@ pub struct CreateCompletionRequest {
     /// We generally recommend altering this or top_p but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f32>,
-    /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. 
+    /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
     /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
     /// We generally recommend altering this or temperature but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_p: Option<f32>,
     /// How many completions to generate for each prompt.
-    /// Note: Because this parameter generates many completions, it can quickly consume your token quota. 
+    /// Note: Because this parameter generates many completions, it can quickly consume your token quota.
     /// Use carefully and ensure that you have reasonable settings for max_tokens and stop.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub n: Option<u16>,
     /// Whether to stream back partial progress. If set, tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream: Option<bool>,
-    /// Include the log probabilities on the logprobs most likely tokens, as well the chosen tokens. For example, if logprobs is 5, the API will return a list of the 5 most likely tokens. 
+    /// Include the log probabilities on the logprobs most likely tokens, as well the chosen tokens. For example, if logprobs is 5, the API will return a list of the 5 most likely tokens.
     /// The API will always return the logprob of the sampled token, so there may be up to logprobs+1 elements in the response.
     /// The maximum value for logprobs is 5. If you need more than this, please contact us through our Help center and describe your use case.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -138,18 +138,18 @@ pub struct CreateCompletionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub best_of: Option<u16>,
     /// Modify the likelihood of specified tokens appearing in the completion.
-    /// Accepts a json object that maps tokens (specified by their token ID in the GPT tokenizer) to an associated bias value from -100 to 100. 
-    /// You can use this tokenizer tool (which works for both GPT-2 and GPT-3) to convert text to token IDs. 
+    /// Accepts a json object that maps tokens (specified by their token ID in the GPT tokenizer) to an associated bias value from -100 to 100.
+    /// You can use this tokenizer tool (which works for both GPT-2 and GPT-3) to convert text to token IDs.
     /// Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token.
     /// As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub logit_bias: Option<serde_json::Value>,
-    /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. 
+    /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateCompletionResponseChoice {
     pub text: String,
     pub index: i64,
@@ -157,14 +157,14 @@ pub struct CreateCompletionResponseChoice {
     pub finish_reason: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Usage {
     pub prompt_tokens: i64,
     pub completion_tokens: i64,
     pub total_tokens: i64,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateCompletionResponse {
     pub id: String,
     pub object: String,
@@ -174,13 +174,13 @@ pub struct CreateCompletionResponse {
     pub usage: Usage,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ChatFormat {
     pub role: String,
     pub content: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateChatCompletionRequest {
     /// ID of the model to use. Currently, only gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
     pub model: String,
@@ -213,7 +213,7 @@ pub struct CreateChatCompletionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frequency_penalty: Option<f32>,
     /// Modify the likelihood of specified tokens appearing in the completion.
-    /// Accepts a json object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100. 
+    /// Accepts a json object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100.
     /// Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub logit_bias: Option<serde_json::Value>,
@@ -222,14 +222,14 @@ pub struct CreateChatCompletionRequest {
     pub user: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateChatCompletionResponseChoice {
     pub message: ChatFormat,
     pub index: i64,
     pub finish_reason: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateChatCompletionResponse {
     pub id: String,
     pub object: String,
@@ -238,7 +238,7 @@ pub struct CreateChatCompletionResponse {
     pub usage: Usage,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateEditRequest {
     /// ID of the model to use. You can use the text-davinci-edit-001 or code-davinci-edit-001 model with this endpoint
     pub model: String,
@@ -254,20 +254,20 @@ pub struct CreateEditRequest {
     /// We generally recommend altering this or top_p but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f32>,
-    /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. 
+    /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
     /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
     /// We generally recommend altering this or temperature but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_p: Option<f32>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateEditResponseChoice {
     pub index: i64,
     pub text: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateEditResponse {
     pub object: String,
     pub created: i64,
@@ -275,7 +275,7 @@ pub struct CreateEditResponse {
     pub usage: Usage,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum ImageFormat {
     #[serde(rename = "url")]
     URL,
@@ -290,10 +290,10 @@ impl Display for ImageFormat {
             ImageFormat::B64JSON => write!(f, "b64_json"),
         }
     }
-    
+
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateImageRequest {
     /// A text description of the desired image(s). The maximum length is 1000 characters.
     pub prompt: String,
@@ -319,15 +319,15 @@ pub enum CreateImageResponseData {
     B64Json(String),
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateImageResponse {
     pub created: i64,
     pub data: Vec<CreateImageResponseData>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateImageEditRequest {
-    /// The image to edit. Must be a valid PNG file, less than 4MB, and square. 
+    /// The image to edit. Must be a valid PNG file, less than 4MB, and square.
     /// If mask is not provided, image must have transparency, which will be used as the mask.
     pub image: String,
     /// An additional image whose fully transparent areas (e.g. where alpha is zero) indicate where image should be edited. Must be a valid PNG file, less than 4MB, and have the same dimensions as image.
@@ -351,7 +351,7 @@ pub struct CreateImageEditRequest {
 
 pub type CreateImageEditResponse = CreateImageResponse;
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateImageVariationRequest {
     /// The image to use as the basis for the variation(s). Must be a valid PNG file, less than 4MB, and square.
     pub image: String,
@@ -371,7 +371,7 @@ pub struct CreateImageVariationRequest {
 
 pub type CreateImageVariationResponse = CreateImageResponse;
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateEmbeddingsRequest {
     /// ID of the model to use. You can use the List models API to see all of your available models, or see our Model overview for descriptions of them.
     pub model: String,
@@ -382,20 +382,20 @@ pub struct CreateEmbeddingsRequest {
     pub user: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateEmbeddingsResponseData {
     pub object: String,
     pub embedding: Vec<f32>,
     pub index: i64,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateEmbeddingsResponseUsage {
     pub prompt_tokens: i64,
     pub total_tokens: i64,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateEmbeddingsResponse {
     pub object: String,
     pub data: Vec<CreateEmbeddingsResponseData>,
@@ -426,10 +426,10 @@ impl Display for CreateTranscriptionResponseFormat {
             CreateTranscriptionResponseFormat::VERBOSEJSON => write!(f, "verbose_json"),
             CreateTranscriptionResponseFormat::VTT => write!(f, "vtt"),
         }
-    } 
+    }
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateTranscriptionRequest {
     /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
     pub file: String,
@@ -457,23 +457,23 @@ pub enum CreateTranscriptionResponse {
     Vtt(CreateTranscriptionResponseVtt),
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateTranscriptionResponseText {
     pub text: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateTranscriptionResponseJson {
     pub text: String,
 }
 
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateTranscriptionResponseSrt {
     pub text: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct TranscriptionSegment {
     pub id: String,
     pub seek: i32,
@@ -487,8 +487,8 @@ pub struct TranscriptionSegment {
     pub no_speech_prob: f64,
     pub transient: bool,
 }
-    
-#[derive(Deserialize, Serialize, Debug)]
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateTranscriptionResponseVerboseJson {
     pub task: String,
     pub language: String,
@@ -497,12 +497,12 @@ pub struct CreateTranscriptionResponseVerboseJson {
     pub text: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateTranscriptionResponseVtt {
     pub text: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateTranslationRequest {
     /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
     pub file: String,
@@ -521,7 +521,7 @@ pub struct CreateTranslationRequest {
 
 pub type CreateTranslationResponse = CreateTranscriptionResponse;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct FileInfo {
     pub id: String,
     pub object: String,
@@ -531,13 +531,13 @@ pub struct FileInfo {
     pub purpose: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ListFilesResponse {
     pub data: Vec<FileInfo>,
     pub object: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct UploadFileRequest {
     /// JSON Lines file to be uploaded.
     /// If the purpose is set to "fine-tune", each line is a JSON record with "prompt" and "completion" fields representing your training examples.
@@ -550,7 +550,7 @@ pub struct UploadFileRequest {
 
 pub type UploadFileResponse = FileInfo;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DeleteFileResponse {
     pub deleted: bool,
     pub id: String,
@@ -559,24 +559,24 @@ pub struct DeleteFileResponse {
 
 pub type RetrieveFileResponse = FileInfo;
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateFineTuneRequest {
     /// The ID of an uploaded file that contains training data.
     /// See upload file for how to upload a file.
-    /// Your dataset must be formatted as a JSONL file, where each training example is a JSON object with the keys "prompt" and "completion". 
+    /// Your dataset must be formatted as a JSONL file, where each training example is a JSON object with the keys "prompt" and "completion".
     /// Additionally, you must upload your file with the purpose fine-tune.
     pub training_file: String,
 
     /// The ID of an uploaded file that contains validation data.
-    /// If you provide this file, the data is used to generate validation metrics periodically during fine-tuning. 
+    /// If you provide this file, the data is used to generate validation metrics periodically during fine-tuning.
     /// These metrics can be viewed in the fine-tuning results file. Your train and validation data should be mutually exclusive.
-    /// Your dataset must be formatted as a JSONL file, where each validation example is a JSON object with the keys "prompt" and "completion". 
+    /// Your dataset must be formatted as a JSONL file, where each validation example is a JSON object with the keys "prompt" and "completion".
     /// Additionally, you must upload your file with the purpose fine-tune.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub validation_file: Option<String>,
 
-    /// The name of the base model to fine-tune. 
-    /// You can select one of "ada", "babbage", "curie", "davinci", or a fine-tuned model created after 2022-04-21. 
+    /// The name of the base model to fine-tune.
+    /// You can select one of "ada", "babbage", "curie", "davinci", or a fine-tuned model created after 2022-04-21.
     /// To learn more about these models
     #[serde(skip_serializing_if = "Option::is_none")]
     pub model: Option<String>,
@@ -591,7 +591,7 @@ pub struct CreateFineTuneRequest {
     pub batch_size: Option<i32>,
 
     /// The learning rate multiplier to use for training. The fine-tuning learning rate is the original learning rate used for pretraining multiplied by this value.
-    /// By default, the learning rate multiplier is the 0.05, 0.1, or 0.2 depending on final batch_size (larger learning rates tend to perform better with larger batch sizes). 
+    /// By default, the learning rate multiplier is the 0.05, 0.1, or 0.2 depending on final batch_size (larger learning rates tend to perform better with larger batch sizes).
     /// We recommend experimenting with values in the range 0.02 to 0.2 to see what produces the best results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub learning_rate_multiplier: Option<f32>,
@@ -601,9 +601,9 @@ pub struct CreateFineTuneRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_loss_weight: Option<f32>,
 
-    /// If set, we calculate classification-specific metrics such as accuracy and F-1 score using the validation set at the end of every epoch. 
+    /// If set, we calculate classification-specific metrics such as accuracy and F-1 score using the validation set at the end of every epoch.
     /// These metrics can be viewed in the results file.
-    /// In order to compute classification metrics, you must provide a validation_file. 
+    /// In order to compute classification metrics, you must provide a validation_file.
     /// Additionally, you must specify classification_n_classes for multiclass classification or classification_positive_class for binary classification.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub compute_classification_metrics: Option<bool>,
@@ -618,10 +618,10 @@ pub struct CreateFineTuneRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub classification_positive_class: Option<String>,
 
-    /// If this is provided, we calculate F-beta scores at the specified beta values. 
+    /// If this is provided, we calculate F-beta scores at the specified beta values.
     /// The F-beta score is a generalization of F-1 score. This is only used for binary classification.
-    /// With a beta of 1 (i.e. the F-1 score), precision and recall are given the same weight. 
-    /// A larger beta score puts more weight on recall and less on precision. 
+    /// With a beta of 1 (i.e. the F-1 score), precision and recall are given the same weight.
+    /// A larger beta score puts more weight on recall and less on precision.
     /// A smaller beta score puts more weight on precision and less on recall.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub classification_betas: Option<Vec<f32>>,
@@ -632,7 +632,7 @@ pub struct CreateFineTuneRequest {
     pub suffix: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct FineTuneEvent {
     pub object: String,
     pub created_at: i64,
@@ -640,7 +640,7 @@ pub struct FineTuneEvent {
     pub message: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct FineTuneHyperparams {
     pub batch_size: i32,
     pub learning_rate_multiplier: f32,
@@ -648,7 +648,7 @@ pub struct FineTuneHyperparams {
     pub n_epochs: i32,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateFineTuneResponse {
     pub id: String,
     pub object: String,
@@ -665,7 +665,7 @@ pub struct CreateFineTuneResponse {
     pub updated_at: i64,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ListFineTunesResponse {
     pub object: String,
     pub data: Vec<CreateFineTuneResponse>,
@@ -675,33 +675,33 @@ pub type RetrieveFineTuneResponse = CreateFineTuneResponse;
 
 pub type CancelFineTuneResponse = CreateFineTuneResponse;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ListFineTuneEventsResponse {
     pub object: String,
     pub data: Vec<FineTuneEvent>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DeleteFineTuneModelResponse {
     pub id: String,
     pub object: String,
     pub deleted: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct CreateModerationRequest {
     /// The input text to classify
     pub input: Vec<String>,
     /// Two content moderations models are available: text-moderation-stable and text-moderation-latest.
-    /// The default is text-moderation-latest which will be automatically upgraded over time. 
-    /// This ensures you are always using our most accurate model. 
-    /// If you use text-moderation-stable, we will provide advanced notice before updating the model. 
+    /// The default is text-moderation-latest which will be automatically upgraded over time.
+    /// This ensures you are always using our most accurate model.
+    /// If you use text-moderation-stable, we will provide advanced notice before updating the model.
     /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub model: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ModerationCategories {
     pub hate: bool,
     #[serde(rename = "hate/threatening")]
@@ -716,7 +716,7 @@ pub struct ModerationCategories {
     pub violence_graphic: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ModerationCategoryScores {
     pub hate: f64,
     #[serde(rename = "hate/threatening")]
@@ -731,14 +731,14 @@ pub struct ModerationCategoryScores {
     pub violence_graphic: f64,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateModerationResult {
     pub categories: ModerationCategories,
     pub category_scores: ModerationCategoryScores,
     pub flagged: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CreateModerationResponse {
     pub id: String,
     pub model: String,
